@@ -7,3 +7,4 @@
 - MAC addresses (Wi-Fi and Ethernet) read out directly
 - Export to CSV function
 
+<img width="2220" height="1124" alt="grafik" src="https://github.com/user-attachments/assets/34857422-b613-4747-b084-55658bdd073a" />
