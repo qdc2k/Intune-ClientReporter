@@ -67,6 +67,7 @@ if (-not $AppConfig.ModuleImported) {
             <Setter Property="Foreground" Value="#E0E0E0"/>
             <Setter Property="FontFamily" Value="Segoe UI"/>
         </Style>
+        
         <Style TargetType="Button">
             <Setter Property="Background" Value="#333333"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
@@ -122,12 +123,124 @@ if (-not $AppConfig.ModuleImported) {
                 </Trigger>
             </Style.Triggers>
         </Style>
-        <Style TargetType="ComboBox">
-            <Setter Property="Background" Value="#2D2D2D"/>
-            <Setter Property="Foreground" Value="#000000"/>
-            <Setter Property="Padding" Value="5"/>
-            <Setter Property="Height" Value="28"/>
+
+        <SolidColorBrush x:Key="StandardScrollBarTrack" Color="#1E1E1E"/>
+        <SolidColorBrush x:Key="StandardScrollBarThumb" Color="#424242"/>
+        <SolidColorBrush x:Key="StandardScrollBarThumbHover" Color="#5E5E5E"/>
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="{StaticResource StandardScrollBarTrack}"/>
+            <Setter Property="Foreground" Value="{StaticResource StandardScrollBarThumb}"/>
+            <Setter Property="Width" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="{TemplateBinding Background}">
+                            <Track x:Name="PART_Track" IsDirectionReversed="true">
+                                <Track.Thumb>
+                                    <Thumb Background="{TemplateBinding Foreground}">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border Background="{TemplateBinding Background}" CornerRadius="6" Margin="2"/>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
+
+        <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="ToggleButton">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="20" />
+                </Grid.ColumnDefinitions>
+                <Border x:Name="Border" Grid.ColumnSpan="2" CornerRadius="4" Background="#2D2D2D" BorderBrush="#555555" BorderThickness="1" />
+                <Border Grid.Column="0" CornerRadius="4,0,0,4" Margin="1" Background="#2D2D2D" />
+                <Path x:Name="Arrow" Grid.Column="1" Fill="#E0E0E0" HorizontalAlignment="Center" VerticalAlignment="Center" Data="M 0 0 L 4 4 L 8 0 Z"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter TargetName="Border" Property="Background" Value="#3D3D3D" />
+                </Trigger>
+                <Trigger Property="IsChecked" Value="true">
+                    <Setter TargetName="Border" Property="Background" Value="#3D3D3D" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+        <Style TargetType="ComboBox">
+            <Setter Property="Foreground" Value="#E0E0E0"/>
+            <Setter Property="Background" Value="#2D2D2D"/>
+            <Setter Property="BorderBrush" Value="#555555"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton Name="ToggleButton" Template="{StaticResource ComboBoxToggleButton}" Grid.Column="2" Focusable="false" IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press"/>
+                            <ContentPresenter Name="ContentSite" IsHitTestVisible="False" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" Margin="8,3,23,3" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                            <TextBox x:Name="PART_EditableTextBox" 
+                                     Style="{x:Null}" 
+                                     BorderThickness="0" 
+                                     Background="Transparent" 
+                                     Foreground="#E0E0E0" 
+                                     CaretBrush="#E0E0E0" 
+                                     HorizontalAlignment="Stretch" 
+                                     VerticalAlignment="Center" 
+                                     Margin="8,0,23,0" 
+                                     Focusable="True" 
+                                     Visibility="Hidden" 
+                                     IsReadOnly="{TemplateBinding IsReadOnly}"/>
+                            <Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
+                                <Grid Name="DropDown" SnapsToDevicePixels="True" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border x:Name="DropDownBorder" Background="#252525" BorderThickness="1" BorderBrush="#555555"/>
+                                    <ScrollViewer Margin="1" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="HasItems" Value="false">
+                                <Setter TargetName="DropDownBorder" Property="MinHeight" Value="95"/>
+                            </Trigger>
+                            <Trigger Property="IsGrouping" Value="true">
+                                <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                            </Trigger>
+                            <Trigger Property="IsEditable" Value="true">
+                                <Setter Property="IsTabStop" Value="false"/>
+                                <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="ContentSite" Property="Visibility" Value="Hidden"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="#E0E0E0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border Name="Border" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="true">
+                                <Setter TargetName="Border" Property="Background" Value="#007ACC"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style TargetType="DataGrid">
             <Setter Property="Background" Value="#1E1E1E"/>
             <Setter Property="Foreground" Value="#E0E0E0"/>
@@ -207,7 +320,7 @@ if (-not $AppConfig.ModuleImported) {
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <Label    Grid.Column="0" Content="Tenant ID:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <Label    Grid.Column="0" Content="Tenant:" VerticalAlignment="Center" Margin="0,0,5,0"/>
                 <ComboBox x:Name="cboTenant" Grid.Column="1" IsEditable="True" VerticalAlignment="Center"/>
                 <Button   x:Name="btnConnect" Grid.Column="2" Content="Connect" Width="90"/>
 
@@ -293,10 +406,24 @@ $btnClose = $Window.FindName("btnClose")
 
 # --- 4. State Management & Cache Checking ---
 $Script:IsConnected = $false
+$Script:ConnectedTenant = ""
 $Script:ReportData = @()
 
 function Update-CacheUI {
-    $tenantId = $cboTenant.Text.Trim()
+    $tenantId = if ($null -ne $cboTenant.SelectedItem) { $cboTenant.SelectedItem.ToString() } else { $cboTenant.Text }
+    $tenantId = $tenantId.Trim()
+    
+    if ($Script:IsConnected -and -not [string]::IsNullOrEmpty($tenantId) -and $tenantId -ne $Script:ConnectedTenant) {
+        try { Disconnect-MgGraph -ErrorAction SilentlyContinue } catch { }
+        $Script:IsConnected = $false
+        $Script:ConnectedTenant = ""
+        $btnConnect.Content = "Connect"
+        $btnFetch.IsEnabled = $false
+        $txtStatus.Text = "Tenant changed. Connection closed."
+        $pbStatus.Visibility = [System.Windows.Visibility]::Collapsed
+        $pbStatus.Value = 0
+    }
+
     $cacheFile = Get-CacheFilePath $tenantId
 
     if ($cacheFile -and (Test-Path -Path $cacheFile)) {
@@ -304,7 +431,6 @@ function Update-CacheUI {
         $txtCacheStatus.Text = "Cached data timestamp: $lastUpdate"
         $txtCacheStatus.Foreground = "#00A000"
         
-        # --- Auto-load logic ---
         try {
             $txtStatus.Text = "Auto-loading cached data..."
             $Window.Dispatcher.Invoke([Action] {}, [System.Windows.Threading.DispatcherPriority]::Render)
@@ -330,7 +456,9 @@ function Update-CacheUI {
             
             $dgResults.ItemsSource = $Script:ReportData
             $btnExport.IsEnabled = $true
-            $txtStatus.Text = "Loaded $($Script:ReportData.Count) records from offline cache."
+            
+            # Unconditionally update the status message with exact cache timestamp
+            $txtStatus.Text = "Loaded $($Script:ReportData.Count) records from offline cache ($lastUpdate)."
         }
         catch {
             $txtStatus.Text = "Failed to auto-load cache: $($_.Exception.Message)"
@@ -342,11 +470,15 @@ function Update-CacheUI {
         $dgResults.ItemsSource = $null
         $btnExport.IsEnabled = $false
         $Script:ReportData = @()
-        $txtStatus.Text = "Ready"
+        if (-not $Script:IsConnected) {
+            $txtStatus.Text = "Ready"
+        }
     }
 }
 
-$cboTenant.Add_SelectionChanged({ Update-CacheUI })
+$cboTenant.Add_SelectionChanged({ 
+        $Window.Dispatcher.InvokeAsync({ Update-CacheUI }, [System.Windows.Threading.DispatcherPriority]::Render) | Out-Null
+    })
 $cboTenant.Add_KeyUp({ Update-CacheUI })
 
 $AppConfig.Tenants | ForEach-Object { $cboTenant.Items.Add($_) | Out-Null }
@@ -387,7 +519,7 @@ $backgroundJob = {
         Import-Module Microsoft.Graph.Authentication -ErrorAction Stop
 
         $syncHash.StatusText = "Establishing graph session..."
-        Connect-MgGraph -TenantId $syncHash.TenantId -Scopes "DeviceManagementManagedDevices.Read.All", "User.Read.All" -NoWelcome
+        Connect-MgGraph -TenantId $syncHash.TenantId -Scopes "DeviceManagementManagedDevices.Read.All", "User.Read.All" -NoWelcome -ClientTimeout 600
 
         $now = Get-Date
         
@@ -668,6 +800,7 @@ $btnConnect.Add_Click({
         if ($Script:IsConnected) {
             try { Disconnect-MgGraph -ErrorAction SilentlyContinue } catch { }
             $Script:IsConnected = $false
+            $Script:ConnectedTenant = ""
             $Script:ReportData = @()
             $dgResults.ItemsSource = $null
             $btnConnect.Content = "Connect"
@@ -681,7 +814,7 @@ $btnConnect.Add_Click({
         else {
             $tenantId = $cboTenant.Text.Trim()
             if (-not $tenantId) {
-                [System.Windows.MessageBox]::Show("Please supply a valid Tenant ID GUID string.", "Input Check Failed", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
+                [System.Windows.MessageBox]::Show("Please supply a valid Tenant string.", "Input Check Failed", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
                 return
             }
 
@@ -690,9 +823,10 @@ $btnConnect.Add_Click({
 
             try {
                 Import-Module Microsoft.Graph.Authentication -ErrorAction Stop
-                Connect-MgGraph -TenantId $tenantId -Scopes "DeviceManagementManagedDevices.Read.All", "User.Read.All" -NoWelcome
+                Connect-MgGraph -TenantId $tenantId -Scopes "DeviceManagementManagedDevices.Read.All", "User.Read.All" -NoWelcome -ClientTimeout 600
 
                 $Script:IsConnected = $true
+                $Script:ConnectedTenant = $tenantId
                 $btnConnect.Content = "Disconnect"
                 $btnFetch.IsEnabled = $true
                 $txtStatus.Text = "Session established. Fetching data..."
